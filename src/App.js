@@ -19,14 +19,17 @@ const button = {
 }
 const friends = [
   {
+    id: 1,
     name: 'Fahim',
     age: 19
   },
   {
+    id: 2,
     name: 'HrDelwar',
     age: 19
   },
   {
+    id: 3,
     name: "Amir",
     age: 20
   }
@@ -54,6 +57,8 @@ function App() {
       </header>
       <h1 style={heading}>object property use JSX</h1>
       <h3><a href="#">{person.name} </a>is a <a href="#">{person.type}</a>.</h3>
+      <h1 style={heading}>API data! Random user</h1>
+      <RandomUser></RandomUser>
       <button style={button}>Simple button</button>
       <h1 style={heading}>Component! Similar look and similar data</h1>
       <Singer></Singer>
@@ -71,7 +76,7 @@ function App() {
       <Friends friends={friends[2]}></Friends>
 
       <h1 style={heading}>Dynamic Component! Pass object dynamically</h1>
-      {friends.map(friend => <Friends friends={friend}></Friends>)}
+      {friends.map(friend => <Friends friends={friend} key={friend.id}></Friends>)}
       <h1 style={heading}>react State</h1>
       <Counter></Counter>
       <h1 style={heading}>API data useEffect</h1>
@@ -124,7 +129,7 @@ function Counter() {
   )
 }
 
-function Users() {
+const Users = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -136,13 +141,45 @@ function Users() {
   return (
     <div className="">
       <h2>Dynamic users</h2>
-      {users.map(user =>
-        <div style={container}>
-          <h3>{user.name}</h3>
-          <p><a href={'mailto:'+ user.email}>{user.email}</a></p>
-          <p><a  target="_blank" href={"https://www."+user.website}>{user.website}</a></p>
-        </div>)}
+      {users.map(user => <DisplayUsers user={user} key={user.id}></DisplayUsers>)}
     </div>
   )
 }
+
+const DisplayUsers = props => {
+  return (
+    <div style={container}>
+      <h3>{props.user.name}</h3>
+      <p><a href={'mailto:' + props.user.email}>{props.user.email}</a></p>
+      <p><a target="_blank" href={"https://www." + props.user.website}>{props.user.website}</a></p>
+    </div>
+  )
+}
+
+const RandomUser = () => {
+  const [randomUser, setRandomUser] = useState({ name: '', email: '', location: '', gender: '', picture: '', phone: '', dob: '' });
+  let { gender, email, location, name, picture, phone, dob } = randomUser;
+  useEffect(async () => {
+    const response = await fetch('https://randomuser.me/api/');
+    const data = await response.json();
+    setRandomUser(data.results[0]);
+  }, [])
+  if(name){
+    return (
+      <div className="" style={container}>
+        <div className=""><img style={{ borderRadius: '50%', marginTop: '20px' }} src={picture.large} alt="" /></div>
+        <h2 style={{marginBottom:'0'}}>{name.title} {name.first} {name.last} </h2>
+        <p>Gender: <small style={{color:'#0009',fontSize:'16px',textTransform:'capitalize'}}>{gender}</small></p>
+        <p>Age: <small style={{color:'#0009',fontSize:'16px'}}>{dob.age}</small></p>
+        <p style={{marginTop:'10px'}}>Email: <a href={'mailto:' + email}> {email}</a></p>
+        <p>Phone: <a href={'tel:' + phone}>{phone}</a></p>
+        <p>Location : {location.city}, {location.country}.</p>
+      </div>
+    )
+  }else{
+    return '';
+  }
+ 
+}
+
 export default App;
